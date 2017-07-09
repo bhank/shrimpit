@@ -48,8 +48,7 @@ class Ui {
 
   exec (argv) {
     // Remove execPath and path from argv.
-    const [, , ...src] = argv
-    this.src = this.cleanSrc(src)
+    const src = this.cleanSrc(argv.slice(2));
 
     log(chalk.white.bgMagenta.bold(' Shrimpit! '))
 
@@ -57,9 +56,8 @@ class Ui {
 
     if (this.displayHelp) return this.renderHelp()
 
-    this.shrimpit = new Shrimpit(...src);
-    // Start reading and parsing the directories.
-    this.src.map(target => this.shrimpit.read(null, target))
+    this.shrimpit = new Shrimpit();
+    this.shrimpit.exec(src);
 
     if (this.displayTree) this.renderTree()
 

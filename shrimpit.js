@@ -9,7 +9,7 @@ const merge = require('lodash.merge')
 const traverse = require('babel-traverse').default
 
 class Shrimpit {
-  constructor (...src) {
+  constructor () {
     this.allowedTypes = /^\.(jsx?|vue)$/
     this.filesTree = {}
     this.isVueTemplate = /^\.vue$/
@@ -68,6 +68,11 @@ class Shrimpit {
     console.error(`! ${e} `)
 
     process.exit(1)
+  }
+
+  exec (...src) {
+    // Start reading and parsing the directories.
+    src.map(target => this.read(null, target))
   }
 
   getAST (src, path) {
