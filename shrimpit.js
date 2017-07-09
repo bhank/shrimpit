@@ -2,22 +2,14 @@
 
 const fs = require('fs')
 const path = require('path')
-const util = require('util')
 
 const babylon = require('babylon')
-const chalk = require('chalk')
 const cheerio = require('cheerio')
 const merge = require('lodash.merge')
 const traverse = require('babel-traverse').default
 
-const log = i => console.log(i, '\n')
-const objectLog = o => console.log(util.inspect(o, false, null, true), '\n')
-
 class Shrimpit {
-  constructor (argv) {
-    // Remove execPath and path from argv.
-    const [, , ...src] = argv
-
+  constructor (...src) {
     this.allowedTypes = /^\.(jsx?|vue)$/
     this.filesTree = {}
     this.isVueTemplate = /^\.vue$/
@@ -46,7 +38,6 @@ class Shrimpit {
       ],
       sourceType: 'module'
     }
-    this.src = this.cleanSrc(src)
   }
 
   addDir (extPath) {
@@ -57,29 +48,6 @@ class Shrimpit {
     if (!(this.allowedTypes.test(this.getExt(extPath)))) return
 
     this.updateFilesTree([...this.getDir(extPath), this.getBase(extPath)], this.walkAST(extPath))
-  }
-
-  cleanSrc (src) {
-    return src.filter(s => {
-      const flagRegex = /^--(\w+)$/i
-
-      if (flagRegex.test(s)) {
-        switch (s.match(flagRegex)[1]) {
-          case 'help':
-            this.displayHelp = true
-            break
-
-          case 'tree':
-            this.displayTree = true
-            break
-
-          default:
-            this.displayUnknownFlag = true
-        }
-      }
-
-      return !flagRegex.test(s)
-    })
   }
 
   dedupe (array) {
@@ -97,24 +65,9 @@ class Shrimpit {
   }
 
   error (e) {
-    log(chalk.red(`! ${e} `))
+    console.error(`! ${e} `)
 
     process.exit(1)
-  }
-
-  exec () {
-    log(chalk.white.bgMagenta.bold(' Shrimpit! '))
-
-    if (this.displayUnknownFlag) return this.renderUnknownFlag()
-
-    if (this.displayHelp) return this.renderHelp()
-
-    // Start reading and parsing the directories.
-    this.src.map(target => this.read(null, target))
-
-    if (this.displayTree) this.renderTree()
-
-    this.renderUnused()
   }
 
   getAST (src, path) {
@@ -185,30 +138,6 @@ class Shrimpit {
     } catch (e) {
       this.error(e)
     }
-  }
-
-  renderHelp () {
-    log([
-      'Usage:',
-      '  shrimpit [<file | directory> ...]',
-      '',
-      'Options:',
-      ' --tree  Output the complete files tree',
-      '',
-      'Examples:',
-      '  shrimpit test/a/a2.js',
-      '  shrimpit test'
-    ].join('\n'))
-  }
-
-  renderTree () {
-    log(chalk.magenta.bgWhite(' > Files tree '))
-
-    objectLog(this.filesTree)
-  }
-
-  renderUnknownFlag () {
-    this.error('Unknown flag provided, try --help.')
   }
 
   getUnresolved() {
