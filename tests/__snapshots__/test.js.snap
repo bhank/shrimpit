@@ -20,10 +20,10 @@ Array [
 `;
 
 exports[`a unresolved 1`] = `
-Set {
+Array [
   "test/a/a2",
   "test/a/a4 a4",
-}
+]
 `;
 
 exports[`b exports 1`] = `
@@ -37,9 +37,9 @@ Array [
 exports[`b imports 1`] = `Array []`;
 
 exports[`b unresolved 1`] = `
-Set {
+Array [
   "test/b/b1 b1",
   "test/b/b1",
   "test/b/b2",
-}
+]
 `;

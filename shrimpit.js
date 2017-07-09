@@ -2,7 +2,6 @@
 
 const fs = require('fs')
 const path = require('path')
-
 const babylon = require('babylon')
 const cheerio = require('cheerio')
 const merge = require('lodash.merge')
@@ -154,7 +153,16 @@ class Shrimpit {
 
     this.dedupe(imports).forEach(i => unresolved.delete(i))
 
-    return unresolved;
+    return [...unresolved];
+  }
+
+  getUnresolvedDetail() {
+    return this.getUnresolved()
+      .map(m => {
+        const detail = this.exportDetails[m];
+        if(!detail) return m;
+        return `${detail.fileName}(${detail.line},${detail.column}): ${detail.exportName}`;
+      });
   }
 
   updateFilesTree (arrayPath, modules = null) {

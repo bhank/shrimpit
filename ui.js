@@ -1,14 +1,7 @@
 #!/usr/bin/env node
 
-const fs = require('fs')
-const path = require('path')
 const util = require('util')
-
-const babylon = require('babylon')
 const chalk = require('chalk')
-const cheerio = require('cheerio')
-const merge = require('lodash.merge')
-const traverse = require('babel-traverse').default
 
 const Shrimpit = require("./shrimpit");
 
@@ -90,16 +83,10 @@ class Ui {
   }
 
   renderUnused () {
-    const unresolved = this.shrimpit.getUnresolved();
-
+    const unresolved = this.shrimpit.getUnresolvedDetail();
     log(chalk.magenta.bgWhite(' > Unused exports '))
-
     if (unresolved.size === 0) log(chalk.yellow('All Clear Ahead, Captain.'))
-    else objectLog([...unresolved].map(m => {
-      const detail = this.shrimpit.exportDetails[m];
-      if(!detail) return m;
-      return `${detail.fileName}(${detail.line},${detail.column}): ${detail.exportName}`;
-    }))
+    else unresolved.forEach(u => {console.log(u)});
   }
 }
 
