@@ -319,6 +319,4 @@ class Shrimpit {
   }
 }
 
-const shrimpit = new Shrimpit(process.argv)
-
-shrimpit.exec()
+module.exports = Shrimpit;
