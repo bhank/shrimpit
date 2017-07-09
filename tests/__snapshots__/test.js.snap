@@ -6,13 +6,13 @@ Array [
   "a12",
   "a2",
   "a4",
-  "test\\\\a\\\\a4",
+  "test/a/a4",
 ]
 `;
 
 exports[`a imports 1`] = `
 Array [
-  "test\\\\a\\\\a4",
+  "test/a/a4",
   "test",
   "a11",
   "a12",
@@ -29,8 +29,8 @@ Set {
 exports[`b exports 1`] = `
 Array [
   "b1",
-  "test\\\\b\\\\b1",
-  "test\\\\b\\\\b2",
+  "test/b/b1",
+  "test/b/b2",
 ]
 `;
 
@@ -39,7 +39,7 @@ exports[`b imports 1`] = `Array []`;
 exports[`b unresolved 1`] = `
 Set {
   "b1",
-  "test\\\\b\\\\b1",
-  "test\\\\b\\\\b2",
+  "test/b/b1",
+  "test/b/b2",
 }
 `;

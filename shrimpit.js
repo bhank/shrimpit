@@ -72,6 +72,10 @@ class Shrimpit {
     src.map(target => this.read(null, target))
   }
 
+  fixSlashes(filePath) {
+    return filePath.replace(/\\/g, "/");
+  }
+
   getAST (src, path) {
     try {
       return babylon.parse(src, this.parseOpts)
@@ -173,7 +177,7 @@ class Shrimpit {
     const defaultExportVisitor = {
       Expression (path) {
         // Use path as default.
-        exports.push(self.deExtensionize(extPath))
+        exports.push(self.fixSlashes(self.deExtensionize(extPath)))
 
         // Stop traversal as an expression was found.
         path.stop()
@@ -193,7 +197,7 @@ class Shrimpit {
       },
 
       Statement (path, expectNamedFunction) {
-        if (expectNamedFunction) exports.push(self.deExtensionize(extPath))
+        if (expectNamedFunction) exports.push(self.fixSlashes(self.deExtensionize(extPath)))
       }
     }
 
@@ -224,7 +228,7 @@ class Shrimpit {
 
       ImportDefaultSpecifier (path) {
         imports.push(
-          self.deExtensionize(self.joinPaths(extPath, '../', path.parent.source.value))
+          self.fixSlashes(self.deExtensionize(self.joinPaths(extPath, '../', path.parent.source.value)))
         )
       },
 
