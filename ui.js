@@ -95,7 +95,11 @@ class Ui {
     log(chalk.magenta.bgWhite(' > Unused exports '))
 
     if (unresolved.size === 0) log(chalk.yellow('All Clear Ahead, Captain.'))
-    else objectLog([...unresolved])
+    else objectLog([...unresolved].map(m => {
+      const detail = this.shrimpit.exportDetails[m];
+      if(!detail) return m;
+      return `${detail.fileName}(${detail.line},${detail.column}): ${detail.exportName}`;
+    }))
   }
 }
 

@@ -15,8 +15,10 @@ class Shrimpit {
     this.isVueTemplate = /^\.vue$/
     this.modules = {
       exports: [],
-      imports: []
+      imports: [],
     }
+    this.exportDetails = {};
+
     this.parseOpts = {
       allowImportExportEverywhere: true,
       plugins: [
@@ -176,8 +178,15 @@ class Shrimpit {
 
     const defaultExportVisitor = {
       Expression (path) {
-        // Use path as default.
-        exports.push(self.fixSlashes(self.deExtensionize(extPath)))
+        const fileName = self.fixSlashes(self.deExtensionize(extPath));
+        const key = fileName;
+        exports.push(key);
+        self.exportDetails[key] = {
+          exportName: "(default)",
+          fileName,
+          line: path.node.loc.start.line,
+          column: path.node.loc.start.column,
+        };
 
         // Stop traversal as an expression was found.
         path.stop()
@@ -190,14 +199,35 @@ class Shrimpit {
 
     const exportVisitor = {
       Identifier (path) {
-        exports.push(path.node.name)
+        const fileName = self.fixSlashes(self.deExtensionize(extPath));
+        const isDefaultExport = path.parentPath.parent.type === "ExportDefaultDeclaration";
+        const exportName = isDefaultExport ? "(default)" : path.node.name;
+        // TODO: can you import it explicitly by name, as well as importing the default? This assumes default only.
+        const key = fileName + (isDefaultExport ? "" : ` ${exportName}`);
+        exports.push(key);
+        self.exportDetails[key] = {
+          exportName,
+          fileName,
+          line: path.node.loc.start.line,
+          column: path.node.loc.start.column,
+        };
 
         // Stop traversal to avoid collecting unwanted identifiers.
         path.stop()
       },
 
       Statement (path, expectNamedFunction) {
-        if (expectNamedFunction) exports.push(self.fixSlashes(self.deExtensionize(extPath)))
+        if (expectNamedFunction) {
+          const fileName = self.fixSlashes(self.deExtensionize(extPath));
+          const key = fileName;
+          exports.push(key);
+          self.exportDetails[key] = {
+            exportName: "(default)",
+            fileName,
+            line: path.node.loc.start.line,
+            column: path.node.loc.start.column,
+          };
+        }
       }
     }
 
@@ -227,17 +257,19 @@ class Shrimpit {
       },
 
       ImportDefaultSpecifier (path) {
-        imports.push(
-          self.fixSlashes(self.deExtensionize(self.joinPaths(extPath, '../', path.parent.source.value)))
-        )
+        const fileName = self.fixSlashes(self.deExtensionize(self.joinPaths(extPath, '../', path.parent.source.value)));
+        imports.push(fileName);
       },
 
       ImportNamespaceSpecifier (path) {
-        imports.push(path.node.local.name)
+        const fileName = self.fixSlashes(self.deExtensionize(self.joinPaths(extPath, '../', path.parent.source.value)));
+        //imports.push(`${fileName} * as ${path.node.local.name}`); // TODO: should I do something different for *? It could be considered as referencing all exports.
+        imports.push(fileName);
       },
 
       ImportSpecifier (path) {
-        imports.push(path.node.local.name)
+        const fileName = self.fixSlashes(self.deExtensionize(self.joinPaths(extPath, '../', path.parent.source.value)));
+        imports.push(`${fileName} ${path.node.local.name}`);
       }
     })
 
