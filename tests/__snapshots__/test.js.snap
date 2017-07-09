@@ -1,0 +1,44 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`a exports 1`] = `
+Array [
+  "a11",
+  "a12",
+  "a2",
+  "a4",
+  "test/a",
+]
+`;
+
+exports[`a imports 1`] = `
+Array [
+  "test/a",
+  "test",
+  "a11",
+  "a12",
+]
+`;
+
+exports[`a unresolved 1`] = `
+Set {
+  "a2",
+  "a4",
+}
+`;
+
+exports[`b exports 1`] = `
+Array [
+  "b1",
+  "test/b",
+  "test/b",
+]
+`;
+
+exports[`b imports 1`] = `Array []`;
+
+exports[`b unresolved 1`] = `
+Set {
+  "b1",
+  "test/b",
+}
+`;
