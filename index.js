@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-const Shrimpit = require("./shrimpit");
-
-const shrimpit = new Shrimpit(process.argv)
-
-shrimpit.exec()
+const Ui = require("./ui");
+const ui = new Ui();
+ui.exec(process.argv)

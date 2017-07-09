@@ -10,44 +10,12 @@ const cheerio = require('cheerio')
 const merge = require('lodash.merge')
 const traverse = require('babel-traverse').default
 
+const Shrimpit = require("./shrimpit");
+
 const log = i => console.log(i, '\n')
 const objectLog = o => console.log(util.inspect(o, false, null, true), '\n')
 
-class Shrimpit {
-  constructor (argv) {
-    // Remove execPath and path from argv.
-    const [, , ...src] = argv
-
-    this.allowedTypes = /^\.(jsx?|vue)$/
-    this.filesTree = {}
-    this.isVueTemplate = /^\.vue$/
-    this.modules = {
-      exports: [],
-      imports: []
-    }
-    this.parseOpts = {
-      allowImportExportEverywhere: true,
-      plugins: [
-        'asyncFunctions',
-        'asyncGenerators',
-        'classConstructorCall',
-        'classProperties',
-        'decorators',
-        'doExpressions',
-        'dynamicImport',
-        'exponentiationOperator',
-        'exportExtensions',
-        'flow',
-        'functionSent',
-        'functionBind',
-        'jsx',
-        'objectRestSpread',
-        'trailingFunctionCommas'
-      ],
-      sourceType: 'module'
-    }
-    this.src = this.cleanSrc(src)
-  }
+class Ui {
 
   addDir (extPath) {
     this.updateFilesTree([...this.getDir(extPath), this.getBase(extPath)])
@@ -102,15 +70,20 @@ class Shrimpit {
     process.exit(1)
   }
 
-  exec () {
+  exec (argv) {
+    // Remove execPath and path from argv.
+    const [, , ...src] = argv
+    this.src = this.cleanSrc(src)
+
     log(chalk.white.bgMagenta.bold(' Shrimpit! '))
 
     if (this.displayUnknownFlag) return this.renderUnknownFlag()
 
     if (this.displayHelp) return this.renderHelp()
 
+    this.shrimpit = new Shrimpit(...src);
     // Start reading and parsing the directories.
-    this.src.map(target => this.read(null, target))
+    this.src.map(target => this.shrimpit.read(null, target))
 
     if (this.displayTree) this.renderTree()
 
@@ -204,7 +177,7 @@ class Shrimpit {
   renderTree () {
     log(chalk.magenta.bgWhite(' > Files tree '))
 
-    objectLog(this.filesTree)
+    objectLog(this.shrimpit.filesTree)
   }
 
   renderUnknownFlag () {
@@ -212,10 +185,7 @@ class Shrimpit {
   }
 
   renderUnused () {
-    const { exports, imports } = this.modules
-    let unresolved = new Set(this.dedupe(exports))
-
-    this.dedupe(imports).forEach(i => unresolved.delete(i))
+    const unresolved = this.shrimpit.getUnresolved();
 
     log(chalk.magenta.bgWhite(' > Unused exports '))
 
@@ -319,4 +289,4 @@ class Shrimpit {
   }
 }
 
-module.exports = Shrimpit;
+module.exports = Ui;

@@ -211,16 +211,13 @@ class Shrimpit {
     this.error('Unknown flag provided, try --help.')
   }
 
-  renderUnused () {
+  getUnresolved() {
     const { exports, imports } = this.modules
     let unresolved = new Set(this.dedupe(exports))
 
     this.dedupe(imports).forEach(i => unresolved.delete(i))
 
-    log(chalk.magenta.bgWhite(' > Unused exports '))
-
-    if (unresolved.size === 0) log(chalk.yellow('All Clear Ahead, Captain.'))
-    else objectLog([...unresolved])
+    return unresolved;
   }
 
   updateFilesTree (arrayPath, modules = null) {
