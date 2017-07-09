@@ -19,3 +19,17 @@ test("test directory b", () => {
     expect(shrimpit.modules.imports).toMatchSnapshot("b imports");
     expect(shrimpit.getUnresolved()).toMatchSnapshot("b unresolved");
 });
+
+describe("deExtensionize", () => {
+    const shrimpit = new Shrimpit();
+    [
+        {path: "./dir/subdir/file.ext", expected: "./dir/subdir/file"},
+        {path: "./dir/subdir/index.js", expected: "./dir/subdir"},
+        {path: "./dir/subdir/", expected: "./dir/subdir"},
+        {path: ".\\dir\\subdir\\file.ext", expected: ".\\dir\\subdir\\file"},
+        {path: ".\\dir\\subdir\\index.js", expected: ".\\dir\\subdir"},
+        {path: ".\\dir\\subdir\\", expected: ".\\dir\\subdir"},
+    ].forEach(data => {
+        test(`should deExtensionize '${data.path}'`, () => expect(shrimpit.deExtensionize(data.path)).toEqual(data.expected));
+    });
+});

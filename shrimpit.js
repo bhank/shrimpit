@@ -56,12 +56,9 @@ class Shrimpit {
   }
 
   deExtensionize (filePath) {
-    const base = this.getBase(filePath, true)
-
-    return path.dirname([
-      ...this.getDir(filePath),
-      base === 'index' ? [] : base
-    ].join('/'))
+    var deexted = filePath.replace(/\.[^\/\\]+$/, "");
+    var deslashedanddeindexed = deexted.replace(/[\\/](index)?$/, "")
+    return deslashedanddeindexed
   }
 
   error (e) {
